@@ -15,7 +15,8 @@
         "title": "tauri-react-template",
         "width": 800,
         "height": 600,
-        "decorations": false
+        "decorations": false,
+        "visible": false
       }
     ],
     "security": {
