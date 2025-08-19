@@ -1,23 +1,35 @@
 import '@/assets/index.css';
 import { invoke } from '@tauri-apps/api/core';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { WindowTitlebar } from './components/controls';
+import { commands, events } from './bindings';
 
 function App() {
   const [greetMsg, setGreetMsg] = useState('');
   const [name, setName] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
+  useEffect(() => {
+    const listenLogEntryEvent = events.logEvent.listen(event => {
+      console.log('Received log entry:', event.payload);
+    });
+
+    return () => {
+      listenLogEntryEvent.then(unlisten => unlisten());
+    };
+  }, []);
+
   async function greet() {
     if (!name.trim()) return;
 
     setIsLoading(true);
     try {
-      setGreetMsg(await invoke('greet', { name }));
+      const msg = await commands.greet(name);
+      setGreetMsg(msg);
     } finally {
       setIsLoading(false);
     }

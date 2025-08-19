@@ -1,22 +1,48 @@
-use tauri::{Manager, WindowEvent};
+use tauri::{AppHandle, Manager, WindowEvent};
 
 mod window_state;
+use specta_typescript::Typescript;
+use tauri_specta::{collect_commands, collect_events, Builder};
 use window_state::{WindowState, WindowStateManager};
+mod events;
+use events::LogEvent;
+
+use crate::events::emit_log;
 // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
 #[tauri::command]
-fn greet(name: &str) -> String {
+#[specta::specta]
+fn greet(app: AppHandle, name: &str) -> String {
+    emit_log(
+        &app,
+        "info",
+        &format!("{} has been greeted", name),
+        "greet",
+        None,
+    );
     format!("Hello, {}! You've been greeted from Rust!", name)
 }
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
+    let builder = Builder::<tauri::Wry>::new()
+        // Then register them (separated by a comma)
+        .commands(collect_commands![greet])
+        .events(collect_events![LogEvent]);
+    #[cfg(debug_assertions)] // <- Only export on non-release builds
+    builder
+        .export(Typescript::default(), "../src/bindings.ts")
+        .expect("Failed to export typescript bindings");
     tauri::Builder::default()
+        .invoke_handler(builder.invoke_handler())
         .plugin(tauri_plugin_store::Builder::new().build())
         .plugin(tauri_plugin_os::init())
         .plugin(tauri_plugin_opener::init())
-        .setup(|app| {
+        .setup(move |app| {
             let window = app.get_webview_window("main").unwrap();
             let state_manager = WindowStateManager::new(app.handle().clone());
+
+            // Mount events using the moved builder
+            builder.mount_events(app);
 
             // Asynchronously restore window state
             tauri::async_runtime::spawn(async move {
@@ -50,7 +76,6 @@ pub fn run() {
                 _ => {}
             }
         })
-        .invoke_handler(tauri::generate_handler![greet])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
