@@ -22,3 +22,7 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# tauri
+src-tauri/target
+src-tauri/bundler
