@@ -1,6 +1,12 @@
+pub mod db_manager;
+pub mod window_state;
+
 use specta_typescript::Typescript;
+use std::sync::Arc;
 use tauri::ipc::Channel;
+use tauri::Manager;
 use tauri_specta::{collect_commands, collect_events, Builder};
+use window_state::WindowStateManager;
 
 #[tauri::command]
 #[specta::specta]
@@ -41,6 +47,18 @@ pub fn run() {
 
       // Mount events using the moved builder
       builder.mount_events(app);
+
+      // Shared SQLite connection
+      let db = db_manager::init_db().expect("Failed to initialise database");
+
+      // Window state manager — restore on startup, save on close
+      let window_state_manager = WindowStateManager::new(Arc::clone(&db));
+      app.manage(window_state_manager);
+      if let Some(main_window) = app.get_webview_window("main") {
+        app.state::<WindowStateManager>().restore(&main_window);
+      }
+      window_state::register_save_on_close(app.handle());
+
       Ok(())
     })
     .run(tauri::generate_context!())
