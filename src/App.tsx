@@ -2,6 +2,7 @@ import { useState } from 'react';
 
 import { commands } from '@/bindings';
 import { Button } from '@/components/ui/button';
+import { WindowTitlebar } from './tauri-controls/window-titlebar';
 
 export function App() {
   const [greetMsg, setGreetMsg] = useState('');
@@ -12,26 +13,29 @@ export function App() {
   };
 
   return (
-    <div className="flex min-h-svh p-6">
-      <div className="flex max-w-md min-w-0 flex-col gap-4 text-sm/loose">
-        <div>
-          <h1 className="font-medium">Project ready!</h1>
-          <p>You may now add components and start building.</p>
-          <p>We&apos;ve already added the button component for you.</p>
-          {
-            greetMsg && <p>{greetMsg}</p>
-          }
-          <Button className="mt-2" onClick={greeting}>Button</Button>
-        </div>
-        <div className="font-mono text-xs text-muted-foreground">
-          (Press
-          {' '}
-          <kbd>d</kbd>
-          {' '}
-          to toggle dark mode)
-        </div>
+    <main className="flex h-screen flex-col items-center overflow-hidden bg-background">
+      {/* Window title bar with native controls */}
+      <WindowTitlebar
+        className="w-full"
+        windowControlsProps={{ disableMaximize: true }}
+      />
+      <div>
+        <h1 className="font-medium">Project ready!</h1>
+        <p>You may now add components and start building.</p>
+        <p>We&apos;ve already added the button component for you.</p>
+        {
+          greetMsg && <p>{greetMsg}</p>
+        }
+        <Button className="mt-2" onClick={greeting}>Button</Button>
       </div>
-    </div>
+      <div className="font-mono text-xs text-muted-foreground">
+        (Press
+        {' '}
+        <kbd>d</kbd>
+        {' '}
+        to toggle dark mode)
+      </div>
+    </main>
   );
 }
 

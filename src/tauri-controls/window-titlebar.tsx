@@ -1,0 +1,87 @@
+import type { OsType } from "@tauri-apps/plugin-os"
+import { useEffect, useState } from "react"
+import { cn } from "@/tauri-controls/libs/utils"
+import { getOsType } from "./libs/plugin-os"
+import type { WindowTitlebarProps } from "./types"
+import { WindowControls } from "./window-controls"
+
+export function WindowTitlebar({
+  children,
+  controlsOrder = "system",
+  className,
+  windowControlsProps,
+  ...props
+}: WindowTitlebarProps) {
+  const [osType, setOsType] = useState<OsType | undefined>(undefined)
+
+  useEffect(() => {
+    getOsType().then((type) => {
+      setOsType(type)
+    })
+  }, [])
+
+  // macOS uses native traffic lights with titleBarStyle: "Overlay"
+  // Windows/Linux need custom window controls
+  const isMacos = osType === "macos"
+
+  const left =
+    controlsOrder === "left" ||
+    (controlsOrder === "platform" &&
+      windowControlsProps?.platform === "macos") ||
+    (controlsOrder === "system" && isMacos)
+
+  const customProps = (ml: string) => {
+    if (windowControlsProps?.justify !== undefined) return windowControlsProps
+
+    const {
+      justify: windowControlsJustify,
+      className: windowControlsClassName,
+      ...restProps
+    } = windowControlsProps || {}
+    return {
+      justify: false,
+      className: cn(windowControlsClassName, ml),
+      ...restProps,
+    }
+  }
+
+  // On macOS, we use native traffic lights, so just render a drag region
+  if (isMacos) {
+    return (
+      <div
+        className={cn(
+          "flex h-8 flex-row overflow-hidden select-none",
+          className
+        )}
+        data-tauri-drag-region
+        {...props}
+      >
+        {children}
+      </div>
+    )
+  }
+
+  // On Windows/Linux, render custom window controls
+  return (
+    <div
+      className={cn(
+        "flex flex-row overflow-hidden bg-background select-none",
+        className
+      )}
+      data-tauri-drag-region
+      {...props}
+    >
+      {left ? (
+        <>
+          <WindowControls {...customProps("ml-0")} />
+          {children}
+        </>
+      ) : (
+        <>
+          {children}
+          <WindowControls {...customProps("ml-auto")} />
+        </>
+      )}
+    </div>
+  )
+}

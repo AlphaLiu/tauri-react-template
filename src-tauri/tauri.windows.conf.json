@@ -1,0 +1,17 @@
+{
+  "identifier": "com.alpha.mona-unzipper",
+  "app": {
+    "windows": [
+      {
+        "title": "tauri-react-vite-template",
+        "width": 800,
+        "height": 600,
+        "visible": false,
+        "resizable": false,
+        "fullscreen": false,
+        "decorations": false,
+        "transparent": true
+      }
+    ]
+  }
+}

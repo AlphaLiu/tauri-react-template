@@ -28,6 +28,7 @@ pub fn run() {
     .export(Typescript::default(), "../src/bindings.ts")
     .expect("Failed to export typescript bindings");
   tauri::Builder::default()
+    .plugin(tauri_plugin_os::init())
     .invoke_handler(builder.invoke_handler())
     .setup(move |app| {
       if cfg!(debug_assertions) {
