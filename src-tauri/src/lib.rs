@@ -49,7 +49,7 @@ pub fn run() {
       builder.mount_events(app);
 
       // Shared SQLite connection
-      let db = db_manager::init_db().expect("Failed to initialise database");
+      let db = db_manager::init_db(app.handle()).expect("Failed to initialise database");
 
       // Window state manager — restore on startup, save on close
       let window_state_manager = WindowStateManager::new(Arc::clone(&db));
