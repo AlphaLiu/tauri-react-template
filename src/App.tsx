@@ -17,8 +17,14 @@ export function App() {
       {/* Window title bar with native controls */}
       <WindowTitlebar
         className="w-full"
-        windowControlsProps={{ disableMaximize: true }}
-      />
+      >
+        <span className="
+          pointer-events-none absolute inset-0 flex items-center justify-center text-sm font-medium text-foreground/80
+        "
+        >
+          tauri-react-vite-template
+        </span>
+      </WindowTitlebar>
       <div>
         <h1 className="font-medium">Project ready!</h1>
         <p>You may now add components and start building.</p>

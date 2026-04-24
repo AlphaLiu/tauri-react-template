@@ -45,20 +45,9 @@ export function WindowTitlebar({
     }
   }
 
-  // On macOS, we use native traffic lights, so just render a drag region
+  // On macOS with native title bar, no custom titlebar needed
   if (isMacos) {
-    return (
-      <div
-        className={cn(
-          "flex h-8 flex-row overflow-hidden select-none",
-          className
-        )}
-        data-tauri-drag-region
-        {...props}
-      >
-        {children}
-      </div>
-    )
+    return null
   }
 
   // On Windows/Linux, render custom window controls
