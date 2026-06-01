@@ -10,8 +10,13 @@ export function App() {
   const [greetMsg, setGreetMsg] = useState('');
 
   const handleGetStarted = async () => {
-    const msg = await commands.greet('World');
-    setGreetMsg(msg);
+    try {
+      const msg = await commands.greet('World');
+      setGreetMsg(msg);
+    }
+    catch (e) {
+      setGreetMsg(`Error: ${e}`);
+    }
   };
 
   return (
