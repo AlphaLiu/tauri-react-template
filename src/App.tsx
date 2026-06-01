@@ -16,7 +16,6 @@ export function App() {
 
   return (
     <main className="flex h-screen flex-col overflow-hidden bg-background">
-      {/* Native window title bar */}
       <WindowTitlebar className="w-full">
         <span className="
           pointer-events-none absolute inset-0 flex items-center justify-center text-sm font-medium text-foreground/60
@@ -26,14 +25,11 @@ export function App() {
         </span>
       </WindowTitlebar>
 
-      {/* Centered content */}
       <div className="flex flex-1 flex-col items-center justify-center gap-8 px-8">
-        {/* Logo */}
         <div className="flex size-16 items-center justify-center rounded-2xl bg-primary/10 ring-1 ring-primary/20">
           <Zap className="size-8 text-primary" />
         </div>
 
-        {/* Title & subtitle */}
         <div className="flex flex-col items-center gap-2 text-center">
           <h1 className="text-3xl font-semibold tracking-tight text-foreground">
             tauri-react-vite
@@ -43,7 +39,6 @@ export function App() {
           </p>
         </div>
 
-        {/* Feature pills */}
         <div className="flex flex-wrap items-center justify-center gap-2">
           <Badge variant="outline">Tauri 2</Badge>
           <Badge variant="outline">React 19</Badge>
@@ -51,7 +46,6 @@ export function App() {
           <Badge variant="outline">Tailwind 4</Badge>
         </div>
 
-        {/* CTA */}
         <div className="flex flex-col items-center gap-3">
           <Button onClick={handleGetStarted} size="lg" className="gap-2">
             <Zap className="size-4" />
@@ -65,7 +59,6 @@ export function App() {
         </div>
       </div>
 
-      {/* Bottom hint */}
       <div className="pb-4 text-center font-mono text-xs text-muted-foreground/50">
         Press
         {' '}
