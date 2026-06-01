@@ -4,18 +4,35 @@ import { useState } from 'react';
 import { commands } from '@/bindings';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
 import { WindowTitlebar } from './tauri-controls/window-titlebar';
 
 export function App() {
   const [greetMsg, setGreetMsg] = useState('');
+  const [open, setOpen] = useState(false);
+  const [name, setName] = useState('');
 
-  const handleGetStarted = async () => {
+  const handleGetStarted = () => {
+    setOpen(true);
+  };
+
+  const handleGreet = async () => {
     try {
-      const msg = await commands.greet('World');
+      const msg = await commands.greet(name || 'World');
       setGreetMsg(msg);
+      setOpen(false);
+      setName('');
     }
     catch (e) {
       setGreetMsg(`Error: ${e}`);
+      setOpen(false);
     }
   };
 
@@ -71,6 +88,25 @@ export function App() {
         {' '}
         to toggle dark mode
       </div>
+
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogContent className="sm:max-w-sm">
+          <DialogHeader>
+            <DialogTitle>What's your name?</DialogTitle>
+          </DialogHeader>
+          <Input
+            placeholder="Enter your name"
+            value={name}
+            onChange={e => setName(e.target.value)}
+            onKeyDown={e => e.key === 'Enter' && handleGreet()}
+            autoFocus
+          />
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setOpen(false)}>Cancel</Button>
+            <Button onClick={handleGreet}>OK</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </main>
   );
 }
