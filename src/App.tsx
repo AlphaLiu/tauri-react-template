@@ -1,45 +1,77 @@
+import { Zap } from 'lucide-react';
 import { useState } from 'react';
 
 import { commands } from '@/bindings';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { WindowTitlebar } from './tauri-controls/window-titlebar';
 
 export function App() {
   const [greetMsg, setGreetMsg] = useState('');
 
-  const greeting = async () => {
+  const handleGetStarted = async () => {
     const msg = await commands.greet('World');
     setGreetMsg(msg);
   };
 
   return (
-    <main className="flex h-screen flex-col items-center overflow-hidden bg-background">
-      {/* Window title bar with native controls */}
-      <WindowTitlebar
-        className="w-full"
-      >
+    <main className="flex h-screen flex-col overflow-hidden bg-background">
+      {/* Native window title bar */}
+      <WindowTitlebar className="w-full">
         <span className="
-          pointer-events-none absolute inset-0 flex items-center justify-center text-sm font-medium text-foreground/80
+          pointer-events-none absolute inset-0 flex items-center justify-center text-sm font-medium text-foreground/60
         "
         >
           tauri-react-vite-template
         </span>
       </WindowTitlebar>
-      <div>
-        <h1 className="font-medium">Project ready!</h1>
-        <p>You may now add components and start building.</p>
-        <p>We&apos;ve already added the button component for you.</p>
-        {
-          greetMsg && <p>{greetMsg}</p>
-        }
-        <Button className="mt-2" onClick={greeting}>Button</Button>
+
+      {/* Centered content */}
+      <div className="flex flex-1 flex-col items-center justify-center gap-8 px-8">
+        {/* Logo */}
+        <div className="flex size-16 items-center justify-center rounded-2xl bg-primary/10 ring-1 ring-primary/20">
+          <Zap className="size-8 text-primary" />
+        </div>
+
+        {/* Title & subtitle */}
+        <div className="flex flex-col items-center gap-2 text-center">
+          <h1 className="text-3xl font-semibold tracking-tight text-foreground">
+            tauri-react-vite
+          </h1>
+          <p className="max-w-sm text-sm text-muted-foreground">
+            A modern desktop app starter — Tauri 2, React 19, Shadcn UI, and Tailwind CSS 4.
+          </p>
+        </div>
+
+        {/* Feature pills */}
+        <div className="flex flex-wrap items-center justify-center gap-2">
+          <Badge variant="outline">Tauri 2</Badge>
+          <Badge variant="outline">React 19</Badge>
+          <Badge variant="outline">Shadcn UI</Badge>
+          <Badge variant="outline">Tailwind 4</Badge>
+        </div>
+
+        {/* CTA */}
+        <div className="flex flex-col items-center gap-3">
+          <Button onClick={handleGetStarted} size="lg" className="gap-2">
+            <Zap className="size-4" />
+            Get Started
+          </Button>
+          {greetMsg && (
+            <p className="animate-in text-sm text-muted-foreground fade-in">
+              {greetMsg}
+            </p>
+          )}
+        </div>
       </div>
-      <div className="font-mono text-xs text-muted-foreground">
-        (Press
+
+      {/* Bottom hint */}
+      <div className="pb-4 text-center font-mono text-xs text-muted-foreground/50">
+        Press
         {' '}
-        <kbd>d</kbd>
+        <kbd className="rounded-sm border border-border px-1 py-0.5 font-mono text-xs">d</kbd>
         {' '}
-        to toggle dark mode)
+        to toggle dark mode
       </div>
     </main>
   );
