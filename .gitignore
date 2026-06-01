@@ -28,5 +28,3 @@ dist-ssr
 src-tauri/target
 src-tauri/bundler
 
-# tauri-specta
-src/bindings.ts

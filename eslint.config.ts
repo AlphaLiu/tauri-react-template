@@ -16,6 +16,7 @@ export default antfu({
     'src/components/ui/**',
     'src/tauri-controls/**',
     'src-tauri/**',
+    'src/bindings.ts',
   ],
 }, {
   files: [`src/${GLOB_SRC}`],
