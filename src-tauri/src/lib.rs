@@ -3,6 +3,7 @@ mod config;
 use specta_typescript::Typescript;
 
 use tauri::ipc::Channel;
+use tauri::Manager;
 use tauri_specta::{collect_commands, collect_events, Builder};
 
 #[tauri::command]
@@ -38,6 +39,7 @@ pub fn run() {
     .expect("Failed to export typescript bindings");
 
   tauri::Builder::default()
+    .invoke_handler(builder.invoke_handler())
     .setup(move |app| {
       if cfg!(debug_assertions) {
         app.handle().plugin(

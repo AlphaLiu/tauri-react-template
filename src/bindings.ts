@@ -2,15 +2,26 @@
 
 import { invoke as __TAURI_INVOKE, Channel } from "@tauri-apps/api/core";
 
-/** Types */
-export type AppConfig = { theme: string };
-
 /** Commands */
 export const commands = {
 	greet: (name: string) => __TAURI_INVOKE<string>("greet", { name }),
 	testChannel: (onEvent: Channel<string>) => __TAURI_INVOKE<void>("test_channel", { onEvent }),
+	/**  Read the current config. */
 	getConfig: () => typedError<AppConfig, string>(__TAURI_INVOKE("get_config")),
+	/**  Persist an updated config to disk and update the in-memory copy. */
 	setConfig: (config: AppConfig) => typedError<null, string>(__TAURI_INVOKE("set_config", { config })),
+};
+
+/* Types */
+/**
+ *  Application configuration persisted to disk as JSON.
+ * 
+ *  Currently only `theme` is stored (`"light"` | `"dark"` | `"system"`).
+ *  Additional fields can be added later without breaking existing config files
+ *  because `serde` will use the `Default` values for missing fields.
+ */
+export type AppConfig = {
+	theme?: string,
 };
 
 /* Tauri Specta runtime */
@@ -22,3 +33,4 @@ async function typedError<T, E>(result: Promise<T>): Promise<{ status: "ok"; dat
         return { status: "error", error: e as any };
     }
 }
+

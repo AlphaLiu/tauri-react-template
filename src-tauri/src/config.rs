@@ -123,3 +123,39 @@ pub fn set_config(
     *guard = config;
     Ok(())
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn temp_path(name: &str) -> PathBuf {
+        std::env::temp_dir().join(format!("tauri-app-config-{name}")).join("config.json")
+    }
+
+    #[test]
+    fn persist_and_load_roundtrip() {
+        let path = temp_path("roundtrip");
+        let cfg = AppConfig { theme: "dark".to_string() };
+        persist(&cfg, &path).expect("persist should succeed");
+        let loaded = load_or_default(&path);
+        assert_eq!(loaded.theme, "dark");
+        let _ = std::fs::remove_file(&path);
+    }
+
+    #[test]
+    fn missing_file_returns_default() {
+        let path = temp_path("missing");
+        let loaded = load_or_default(&path);
+        assert_eq!(loaded.theme, "system");
+    }
+
+    #[test]
+    fn corrupt_file_returns_default() {
+        let path = temp_path("corrupt");
+        std::fs::create_dir_all(path.parent().unwrap()).unwrap();
+        std::fs::write(&path, "{not valid json").unwrap();
+        let loaded = load_or_default(&path);
+        assert_eq!(loaded.theme, "system");
+        let _ = std::fs::remove_file(&path);
+    }
+}
