@@ -1,13 +1,14 @@
 /* eslint-disable react-refresh/only-export-components */
 import * as React from "react"
 
+import { commands } from "@/bindings"
+
 type Theme = "dark" | "light" | "system"
 type ResolvedTheme = "dark" | "light"
 
 type ThemeProviderProps = {
   children: React.ReactNode
   defaultTheme?: Theme
-  storageKey?: string
   disableTransitionOnChange?: boolean
 }
 
@@ -23,8 +24,8 @@ const ThemeProviderContext = React.createContext<
   ThemeProviderState | undefined
 >(undefined)
 
-function isTheme(value: string | null): value is Theme {
-  if (value === null) {
+function isTheme(value: string | null | undefined): value is Theme {
+  if (value == null) {
     return false
   }
 
@@ -77,28 +78,48 @@ function isEditableTarget(target: EventTarget | null) {
   return false
 }
 
+/** Persist the theme to the native config file via Tauri IPC. */
+async function persistTheme(theme: Theme): Promise<void> {
+  const result = await commands.getConfig()
+  if (result.status === "error") {
+    console.error("ThemeProvider: failed to read config:", result.error)
+    return
+  }
+  const updated = { ...result.data, theme }
+  const writeResult = await commands.setConfig(updated)
+  if (writeResult.status === "error") {
+    console.error("ThemeProvider: failed to write config:", writeResult.error)
+  }
+}
+
 export function ThemeProvider({
   children,
   defaultTheme = "system",
-  storageKey = "theme",
   disableTransitionOnChange = true,
   ...props
 }: ThemeProviderProps) {
-  const [theme, setThemeState] = React.useState<Theme>(() => {
-    const storedTheme = localStorage.getItem(storageKey)
-    if (isTheme(storedTheme)) {
-      return storedTheme
-    }
+  const [theme, setThemeState] = React.useState<Theme>(defaultTheme)
+  // Track whether we have loaded the persisted theme yet.
+  const [loaded, setLoaded] = React.useState(false)
 
-    return defaultTheme
-  })
+  // On mount: load the persisted theme from the native config file.
+  React.useEffect(() => {
+    commands.getConfig().then((result) => {
+      if (result.status === "ok" && isTheme(result.data.theme)) {
+        setThemeState(result.data.theme)
+      }
+      setLoaded(true)
+    }).catch(() => {
+      setLoaded(true)
+    })
+  }, [])
 
   const setTheme = React.useCallback(
     (nextTheme: Theme) => {
-      localStorage.setItem(storageKey, nextTheme)
       setThemeState(nextTheme)
+      persistTheme(nextTheme)
     },
-    [storageKey]
+    []
   )
 
   const applyTheme = React.useCallback(
@@ -121,6 +142,7 @@ export function ThemeProvider({
   )
 
   React.useEffect(() => {
+    if (!loaded) return
     applyTheme(theme)
 
     if (theme !== "system") {
@@ -137,7 +159,7 @@ export function ThemeProvider({
     return () => {
       mediaQuery.removeEventListener("change", handleChange)
     }
-  }, [theme, applyTheme])
+  }, [theme, applyTheme, loaded])
 
   React.useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -167,7 +189,7 @@ export function ThemeProvider({
                 ? "light"
                 : "dark"
 
-        localStorage.setItem(storageKey, nextTheme)
+        persistTheme(nextTheme)
         return nextTheme
       })
     }
@@ -177,32 +199,7 @@ export function ThemeProvider({
     return () => {
       window.removeEventListener("keydown", handleKeyDown)
     }
-  }, [storageKey])
-
-  React.useEffect(() => {
-    const handleStorageChange = (event: StorageEvent) => {
-      if (event.storageArea !== localStorage) {
-        return
-      }
-
-      if (event.key !== storageKey) {
-        return
-      }
-
-      if (isTheme(event.newValue)) {
-        setThemeState(event.newValue)
-        return
-      }
-
-      setThemeState(defaultTheme)
-    }
-
-    window.addEventListener("storage", handleStorageChange)
-
-    return () => {
-      window.removeEventListener("storage", handleStorageChange)
-    }
-  }, [defaultTheme, storageKey])
+  }, [])
 
   const value = React.useMemo(
     () => ({

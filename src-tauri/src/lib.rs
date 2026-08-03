@@ -1,3 +1,5 @@
+mod config;
+
 use specta_typescript::Typescript;
 
 use tauri::ipc::Channel;
@@ -22,12 +24,19 @@ fn test_channel(on_event: Channel<String>) {
 pub fn run() {
   let builder = Builder::<tauri::Wry>::new()
     // Then register them (separated by a comma)
-    .commands(collect_commands![greet, test_channel,])
+    .commands(collect_commands![
+      greet,
+      test_channel,
+      config::get_config,
+      config::set_config,
+    ])
     .events(collect_events![]);
+
   #[cfg(debug_assertions)] // <- Only export on non-release builds
   builder
     .export(Typescript::default(), "../src/bindings.ts")
     .expect("Failed to export typescript bindings");
+
   tauri::Builder::default()
     .setup(move |app| {
       if cfg!(debug_assertions) {
@@ -37,6 +46,11 @@ pub fn run() {
             .build(),
         )?;
       }
+
+      // Initialize config and register with Tauri state
+      let config_handle = config::init(app.handle())
+        .expect("failed to initialize config");
+      app.manage(config_handle);
 
       // Mount events using the moved builder
       builder.mount_events(app);
