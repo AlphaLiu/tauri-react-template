@@ -87,7 +87,7 @@ export function App() {
       <TitleBar isMac={isMac}>
         {/* Title hidden when fullscreen on macOS — traffic lights move to system toolbar */}
         {(!isMac || !isFullscreen) && (
-          <span className="text-sm font-medium select-none">tauri-app</span>
+          <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-sm font-medium select-none">tauri-app</span>
         )}
         <div className="ml-auto flex h-full items-center -mr-2">
           <ThemeToggleButton />
