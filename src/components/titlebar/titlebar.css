@@ -1,0 +1,116 @@
+/* ─────────────────────────────────────────────────────────────────────────
+ * TitleBar styles
+ *
+ * Designed to inherit the app's theme via CSS custom properties.
+ * Override --titlebar-height, --titlebar-bg, and --titlebar-fg
+ * to match your design system.
+ * ───────────────────────────────────────────────────────────────────────── */
+
+:root {
+  --titlebar-height: 40px;
+  --titlebar-bg: var(--background);
+  --titlebar-fg: var(--foreground);
+
+  /* macOS traffic-light safe area width (3 buttons × ~20px + margin) */
+  --titlebar-macos-spacer: 72px;
+}
+
+/* ── Main titlebar bar ──────────────────────────────────────────────────── */
+
+.titlebar {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  height: var(--titlebar-height);
+  background: var(--titlebar-bg);
+  color: var(--titlebar-fg);
+
+  flex-shrink: 0;
+  user-select: none;
+  -webkit-user-select: none;
+  /* Let the OS handle dragging via data-tauri-drag-region */
+}
+
+/* macOS: left padding to clear the native traffic lights */
+.titlebar-macos-spacer {
+  flex-shrink: 0;
+  width: var(--titlebar-macos-spacer);
+  height: 100%;
+}
+
+/* Titlebar content slot — fills the remaining space */
+.titlebar-content {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  height: 100%;
+  padding: 0 8px;
+  overflow: hidden;
+}
+
+/* ── Windows 11 Fluent Design caption buttons ───────────────────────────── */
+/* Spec: 46×32px, borderless, transparent bg, hover reveals surface.        */
+/* Close hover: #C42B1C (Windows 11 official red).                          */
+/* Colors use --titlebar-fg for automatic theme adaptation.                 */
+
+.titlebar-caption-bar {
+  display: flex;
+  align-items: center;
+  height: 100%;
+  flex-shrink: 0;
+}
+
+.titlebar-caption-btn {
+  width: 46px;
+  height: 32px;
+  border: none;
+  border-radius: 0;
+  background: transparent;
+  color: var(--titlebar-fg);
+  opacity: 0.7;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition:
+    background-color 0.15s ease,
+    opacity 0.15s ease;
+  outline: none;
+  padding: 0;
+  flex-shrink: 0;
+  /* Prevent drag-region from capturing button clicks */
+  -webkit-app-region: no-drag;
+  app-region: no-drag;
+}
+
+.titlebar-caption-btn:hover {
+  opacity: 1;
+  background: color-mix(in srgb, var(--titlebar-fg) 10%, transparent);
+}
+
+.titlebar-caption-btn:active {
+  background: color-mix(in srgb, var(--titlebar-fg) 16%, transparent);
+}
+
+/* Close button — Windows 11 red on hover */
+.titlebar-caption-close:hover {
+  background: #c42b1c;
+  color: #ffffff;
+  opacity: 1;
+}
+
+.titlebar-caption-close:active {
+  background: #b22a1b;
+  color: #ffffff;
+}
+
+/* Diminish buttons when window loses focus (Win11 behavior) */
+.titlebar-caption-bar[data-focused="false"] .titlebar-caption-btn {
+  opacity: 0.35;
+}
+
+.titlebar-caption-bar[data-focused="false"] .titlebar-caption-btn:hover {
+  opacity: 1;
+}

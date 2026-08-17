@@ -2,6 +2,7 @@
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 @import "@fontsource-variable/inter";
+@import "@/components/titlebar/titlebar.css";
 
 @custom-variant dark (&:is(.dark *));
 
@@ -123,8 +124,16 @@
     }
   body {
     @apply bg-background text-foreground;
+    /* Support transparent Tauri windows — ensure body/html have no
+       forced opaque background that would block the window transparency */
     }
   html {
     @apply font-sans;
+    }
+  /* Prevent default context menu text selection on drag regions */
+  [data-tauri-drag-region] {
+    cursor: default;
+    user-select: none;
+    -webkit-user-select: none;
     }
 }
