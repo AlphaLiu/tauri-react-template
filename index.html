@@ -8,6 +8,14 @@
   </head>
   <body>
     <div id="root"></div>
+    <!-- Guard for tauri-plugin-frame: the plugin's injected scripts create a
+         full-width transparent drag overlay (titlebar.js) and auto-generated
+         caption buttons (controls.js) that would cover and disable our custom
+         HTML controls. Both scripts bail out when these markers exist, while
+         the native HTMAXBUTTON snap overlay (Rust side) keeps working. -->
+    <div data-tauri-frame-tb hidden>
+      <span id="frame-tb-guard" hidden></span>
+    </div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
