@@ -246,12 +246,17 @@ export function TitleBar({ isMac, children, onClose }: TitleBarProps) {
   }
 
   return (
-    <header className="titlebar" data-tauri-drag-region>
+    // "deep" drag region: clicks anywhere in the subtree (including the
+    // absolutely-centered title span) start a window drag. Bare
+    // data-tauri-drag-region would only accept direct clicks on the element
+    // itself, so the floating title span would swallow drags. Clickable
+    // elements (buttons etc.) still block dragging per Tauri's drag script.
+    <header className="titlebar" data-tauri-drag-region="deep">
       {/* macOS traffic-light safe area: 72px to clear the native buttons */}
-      {isMac && <div className="titlebar-macos-spacer" data-tauri-drag-region />}
+      {isMac && <div className="titlebar-macos-spacer" data-tauri-drag-region="deep" />}
 
       {/* Custom content slot */}
-      <div className="titlebar-content" data-tauri-drag-region>
+      <div className="titlebar-content" data-tauri-drag-region="deep">
         {children}
       </div>
 
