@@ -1,4 +1,5 @@
 mod config;
+mod window_state;
 
 use specta_typescript::Typescript;
 
@@ -97,6 +98,12 @@ pub fn run() {
       let config_handle = config::init(app.handle())
         .expect("failed to initialize config");
       app.manage(config_handle);
+
+      // Restore the main window geometry from window.json and persist it on close
+      if let Some(main_window) = app.get_webview_window("main") {
+        window_state::WindowStateManager::restore(app.handle(), &main_window);
+      }
+      window_state::register_save_on_close(app.handle());
 
       // Mount events using the moved builder
       builder.mount_events(app);
