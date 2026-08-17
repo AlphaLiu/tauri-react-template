@@ -16,6 +16,7 @@
 
 import { useEffect, useRef, useState, type ReactNode } from "react"
 import { getCurrentWindow } from "@tauri-apps/api/window"
+import { listen, type UnlistenFn } from "@tauri-apps/api/event"
 
 export interface WindowControlsProps {
   /** Whether the window is currently maximized */
@@ -28,6 +29,7 @@ export interface WindowControlsProps {
 
 export function WindowControls({ isMaximized, onMaximizeToggle, onClose }: WindowControlsProps) {
   const [isFocused, setIsFocused] = useState(true)
+  const [isMaxOver, setIsMaxOver] = useState(false)
   const unlistenRef = useRef<(() => void) | null>(null)
 
   useEffect(() => {
@@ -50,6 +52,43 @@ export function WindowControls({ isMaximized, onMaximizeToggle, onClose }: Windo
       unlistenRef.current = null
     }
   }, [])
+
+  // The native snap overlay (Windows 11) owns the mouse over the maximize
+  // button, so the webview never receives onclick or :hover there. The
+  // plugin emits these events instead — the click handler is only reached
+  // on Windows; on other platforms the button's plain onClick below keeps
+  // working.
+  useEffect(() => {
+    let cancelled = false
+    const unlisteners: UnlistenFn[] = []
+
+    const wire = async () => {
+      unlisteners.push(
+        await listen("tauri-frame://snap/click", () => {
+          if (!cancelled) {
+            getCurrentWindow().toggleMaximize()
+            onMaximizeToggle?.()
+          }
+        }),
+        await listen("tauri-frame://snap/mouseenter", () => {
+          if (!cancelled) setIsMaxOver(true)
+        }),
+        await listen("tauri-frame://snap/mouseleave", () => {
+          if (!cancelled) setIsMaxOver(false)
+        }),
+        await listen("tauri-frame://snap/mousedown", () => {
+          if (!cancelled) setIsMaxOver(true)
+        }),
+      )
+    }
+
+    wire()
+
+    return () => {
+      cancelled = true
+      unlisteners.forEach((unlisten) => unlisten())
+    }
+  }, [onMaximizeToggle])
 
   function handleMinimize() {
     getCurrentWindow().minimize()
@@ -87,7 +126,7 @@ export function WindowControls({ isMaximized, onMaximizeToggle, onClose }: Windo
 
       {/* Maximize / Restore */}
       <button
-        className="titlebar-caption-btn"
+        className={`titlebar-caption-btn${isMaxOver ? " titlebar-caption-over" : ""}`}
         aria-label={isMaximized ? "Restore" : "Maximize"}
         title={isMaximized ? "Restore" : "Maximize"}
         onClick={handleToggleMaximize}

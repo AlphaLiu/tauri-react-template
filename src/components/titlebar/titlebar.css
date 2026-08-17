@@ -90,7 +90,12 @@
   app-region: no-drag;
 }
 
-.titlebar-caption-btn:hover {
+.titlebar-caption-btn:hover,
+/* The native snap overlay (Windows 11) covers the maximize button, so the
+   webview never sees the mouse there and :hover cannot fire on it.
+   TitleBar.tsx toggles this class from the overlay's mouseenter/mouseleave
+   events instead. */
+.titlebar-caption-btn.titlebar-caption-over {
   opacity: 1;
   background: color-mix(in srgb, var(--titlebar-fg) 10%, transparent);
 }

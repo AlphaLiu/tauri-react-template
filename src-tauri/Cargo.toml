@@ -24,6 +24,14 @@ log = "0.4"
 tauri = { version = "2.11.3", features = [] }
 tauri-plugin-log = "2"
 tauri-plugin-os = "2"
+# Native HTMAXBUTTON overlay over the maximize button: the only way to get the
+# Windows 11 snap-layout flyout on a frameless window (see
+# tauri-snap-layouts docs). titlebar_height/button_width below must match CSS.
+tauri-plugin-frame = "1.1.8"
 specta = "=2.0.0-rc.25"
 specta-typescript = "0.0.12"
 tauri-specta = { version = "=2.0.0-rc.25", features = ["derive", "typescript"] }
+
+# DwmSetWindowAttribute for the window corner radius (DWMWCP_ROUND).
+[target.'cfg(windows)'.dependencies]
+windows-sys = { version = "0.61", features = ["Win32_Foundation", "Win32_Graphics_Dwm"] }
