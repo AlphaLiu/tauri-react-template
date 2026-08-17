@@ -1,3 +1,4 @@
+import { useEffect } from "react"
 import { TitleBar } from "@/components/titlebar"
 import { useTheme } from "@/components/theme-provider"
 import { usePlatform } from "@/hooks/usePlatform"
@@ -39,6 +40,13 @@ function ThemeToggleButton() {
 
 export function App() {
   const { isMac } = usePlatform()
+
+  // Expose platform to CSS for platform-specific overrides (e.g. titlebar height).
+  useEffect(() => {
+    if (isMac) {
+      document.documentElement.dataset.platform = "macos"
+    }
+  }, [isMac])
 
   return (
     <div className="flex h-svh flex-col overflow-hidden">

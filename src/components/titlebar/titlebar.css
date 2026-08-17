@@ -15,6 +15,11 @@
   --titlebar-macos-spacer: 72px;
 }
 
+/* macOS: match native titlebar height so traffic lights align vertically */
+:root[data-platform="macos"] {
+  --titlebar-height: 40px;
+}
+
 /* ── Main titlebar bar ──────────────────────────────────────────────────── */
 
 .titlebar {
