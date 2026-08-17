@@ -7,7 +7,7 @@
  * ───────────────────────────────────────────────────────────────────────── */
 
 :root {
-  --titlebar-height: 40px;
+  --titlebar-height: 32px;
   --titlebar-bg: var(--background);
   --titlebar-fg: var(--foreground);
 
