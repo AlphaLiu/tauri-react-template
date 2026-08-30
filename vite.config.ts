@@ -1,4 +1,5 @@
 import path from "path"
+import { execSync } from "node:child_process"
 import tailwindcss from "@tailwindcss/vite"
 import { defineConfig } from "vite"
 import react, { reactCompilerPreset } from '@vitejs/plugin-react';
@@ -6,8 +7,20 @@ import babel from '@rolldown/plugin-babel';
 
 const host = process.env.TAURI_DEV_HOST
 
+function getGitRev() {
+  try {
+    return execSync("git rev-parse --short HEAD").toString().trim()
+  } catch {
+    return "unknown"
+  }
+}
+
 // https://vite.dev/config/
 export default defineConfig({
+  define: {
+    __BUILD_DATE__: JSON.stringify(new Date().toISOString()),
+    __GIT_REV__: JSON.stringify(getGitRev()),
+  },
   plugins: [react(), tailwindcss(), babel({ presets: [reactCompilerPreset()] })],
   resolve: {
     alias: {

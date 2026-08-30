@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react"
 import { TitleBar } from "@/components/titlebar"
 import { useTheme } from "@/components/theme-provider"
+import { SettingsDialog } from "@/components/settings/settings-dialog"
 import { usePlatform } from "@/hooks/usePlatform"
 
 function ThemeToggleButton() {
@@ -38,9 +39,27 @@ function ThemeToggleButton() {
   )
 }
 
+function SettingsButton({ onClick }: { onClick: () => void }) {
+  return (
+    <button
+      onClick={onClick}
+      title="Settings"
+      aria-label="Settings"
+      className="inline-flex h-full w-[46px] cursor-default items-center justify-center rounded-none bg-transparent text-black/90 hover:bg-black/[.05] active:bg-black/[.03] dark:text-white dark:hover:bg-white/[.06] dark:active:bg-white/[.04]"
+    >
+      {/* Gear icon — same 10×10 viewport convention as window control icons */}
+      <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+        <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z" />
+        <circle cx="12" cy="12" r="3" />
+      </svg>
+    </button>
+  )
+}
+
 export function App() {
   const { isMac } = usePlatform()
   const [isFullscreen, setIsFullscreen] = useState(false)
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false)
 
   // Expose platform to CSS for platform-specific overrides (e.g. titlebar height).
   useEffect(() => {
@@ -90,6 +109,7 @@ export function App() {
           <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-sm font-medium select-none">tauri-app</span>
         )}
         <div className="ml-auto flex h-full items-center -mr-2">
+          <SettingsButton onClick={() => setIsSettingsOpen(true)} />
           <ThemeToggleButton />
         </div>
       </TitleBar>
@@ -107,6 +127,8 @@ export function App() {
           </div>
         </div>
       </main>
+
+      <SettingsDialog open={isSettingsOpen} onOpenChange={setIsSettingsOpen} />
     </div>
   )
 }
