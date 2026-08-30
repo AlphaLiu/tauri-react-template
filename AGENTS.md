@@ -3,6 +3,8 @@
 ## Notes
 
 - Git commits are written in English.
+- use bun for frontend dependencies and scripts (do not mix in npm/pnpm/yarn).
+- shadcn/ui use 'react-aria-components' instead of 'radix-ui'.
 
 ## AI workflow rules
 
