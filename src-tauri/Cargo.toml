@@ -32,6 +32,11 @@ specta = "=2.0.0-rc.25"
 specta-typescript = "0.0.12"
 tauri-specta = { version = "=2.0.0-rc.25", features = ["derive", "typescript"] }
 
+# macOS-only: enable Tauri's private API feature. Cargo merges this with the
+# common `tauri` dependency on macOS; other platforms only use the common features.
+[target.'cfg(target_os = "macos")'.dependencies]
+tauri = { version = "2.11.3", features = ["macos-private-api"] }
+
 # DwmSetWindowAttribute for the window corner radius (DWMWCP_ROUND).
 [target.'cfg(windows)'.dependencies]
 windows-sys = { version = "0.61", features = ["Win32_Foundation", "Win32_Graphics_Dwm"] }
