@@ -12,7 +12,6 @@ export function SettingsButton() {
         onClick={() => {
           setIsOpen(true);
         }}
-        title="Settings"
         aria-label="Settings"
         className="
           max-h-8 w-11.5 cursor-default rounded-none bg-transparent text-black/90
