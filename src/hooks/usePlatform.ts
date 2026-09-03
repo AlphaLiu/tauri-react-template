@@ -9,36 +9,38 @@
  * Tauri runtime is not available.
  */
 
-import { platform as getTauriPlatform } from "@tauri-apps/plugin-os"
+import { platform as getTauriPlatform } from '@tauri-apps/plugin-os';
 
-export type Platform = "macos" | "windows" | "linux" | "ios" | "android" | string
+export type Platform = 'macos' | 'windows' | 'linux' | 'ios' | 'android' | string;
 
-let _cachedPlatform: Platform | null = null
+let _cachedPlatform: Platform | null = null;
 
 /**
  * Resolve the current platform string once and cache it.
  * Returns an empty string if the Tauri runtime is unavailable.
  */
 function resolvePlatform(): Platform {
-  if (_cachedPlatform !== null) return _cachedPlatform
+  if (_cachedPlatform !== null)
+    return _cachedPlatform;
   try {
-    _cachedPlatform = getTauriPlatform()
-  } catch {
-    // Fallback: browser / test environment
-    _cachedPlatform = ""
+    _cachedPlatform = getTauriPlatform();
   }
-  return _cachedPlatform
+  catch {
+    // Fallback: browser / test environment
+    _cachedPlatform = '';
+  }
+  return _cachedPlatform;
 }
 
 export interface PlatformInfo {
   /** Raw platform string: 'macos' | 'windows' | 'linux' | ... */
-  platform: Platform
+  platform: Platform;
   /** true when running on macOS */
-  isMac: boolean
+  isMac: boolean;
   /** true when running on Windows */
-  isWindows: boolean
+  isWindows: boolean;
   /** true when running on Linux */
-  isLinux: boolean
+  isLinux: boolean;
 }
 
 /**
@@ -52,11 +54,11 @@ export interface PlatformInfo {
  * // <TitleBar isMac={isMac} />
  */
 export function usePlatform(): PlatformInfo {
-  const platform = resolvePlatform()
+  const platform = resolvePlatform();
   return {
     platform,
-    isMac: platform === "macos",
-    isWindows: platform === "windows",
-    isLinux: platform === "linux",
-  }
+    isMac: platform === 'macos',
+    isWindows: platform === 'windows',
+    isLinux: platform === 'linux',
+  };
 }

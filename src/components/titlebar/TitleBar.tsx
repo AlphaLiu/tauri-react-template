@@ -14,44 +14,48 @@
  * adapt to the active theme without hardcoding.
  */
 
-import { useEffect, useRef, useState, type ReactNode } from "react"
-import { getCurrentWindow } from "@tauri-apps/api/window"
-import { listen, type UnlistenFn } from "@tauri-apps/api/event"
+import type { UnlistenFn } from '@tauri-apps/api/event';
+import type { ReactNode } from 'react';
+import { listen } from '@tauri-apps/api/event';
+import { getCurrentWindow } from '@tauri-apps/api/window';
+import { useEffect, useRef, useState } from 'react';
 
 export interface WindowControlsProps {
   /** Whether the window is currently maximized */
-  isMaximized: boolean
+  isMaximized: boolean;
   /** Called when maximize/restore is toggled */
-  onMaximizeToggle?: () => void
+  onMaximizeToggle?: () => void;
   /** Called when close button is clicked */
-  onClose?: () => void
+  onClose?: () => void;
 }
 
 export function WindowControls({ isMaximized, onMaximizeToggle, onClose }: WindowControlsProps) {
-  const [isFocused, setIsFocused] = useState(true)
-  const [isMaxOver, setIsMaxOver] = useState(false)
-  const unlistenRef = useRef<(() => void) | null>(null)
+  const [isFocused, setIsFocused] = useState(true);
+  const [isMaxOver, setIsMaxOver] = useState(false);
+  const unlistenRef = useRef<(() => void) | null>(null);
 
   useEffect(() => {
-    const appWindow = getCurrentWindow()
-    let cancelled = false
+    const appWindow = getCurrentWindow();
+    let cancelled = false;
 
     appWindow.onFocusChanged(({ payload }) => {
-      if (!cancelled) setIsFocused(payload)
+      if (!cancelled)
+        setIsFocused(payload);
     }).then((unlisten) => {
       if (cancelled) {
-        unlisten()
-      } else {
-        unlistenRef.current = unlisten
+        unlisten();
       }
-    })
+      else {
+        unlistenRef.current = unlisten;
+      }
+    });
 
     return () => {
-      cancelled = true
-      unlistenRef.current?.()
-      unlistenRef.current = null
-    }
-  }, [])
+      cancelled = true;
+      unlistenRef.current?.();
+      unlistenRef.current = null;
+    };
+  }, []);
 
   // The native snap overlay (Windows 11) owns the mouse over the maximize
   // button, so the webview never receives onclick or :hover there. The
@@ -59,58 +63,62 @@ export function WindowControls({ isMaximized, onMaximizeToggle, onClose }: Windo
   // on Windows; on other platforms the button's plain onClick below keeps
   // working.
   useEffect(() => {
-    let cancelled = false
-    const unlisteners: UnlistenFn[] = []
+    let cancelled = false;
+    const unlisteners: UnlistenFn[] = [];
 
     const wire = async () => {
       unlisteners.push(
-        await listen("tauri-frame://snap/click", () => {
+        await listen('tauri-frame://snap/click', () => {
           if (!cancelled) {
-            getCurrentWindow().toggleMaximize()
-            onMaximizeToggle?.()
+            getCurrentWindow().toggleMaximize();
+            onMaximizeToggle?.();
           }
         }),
-        await listen("tauri-frame://snap/mouseenter", () => {
-          if (!cancelled) setIsMaxOver(true)
+        await listen('tauri-frame://snap/mouseenter', () => {
+          if (!cancelled)
+            setIsMaxOver(true);
         }),
-        await listen("tauri-frame://snap/mouseleave", () => {
-          if (!cancelled) setIsMaxOver(false)
+        await listen('tauri-frame://snap/mouseleave', () => {
+          if (!cancelled)
+            setIsMaxOver(false);
         }),
-        await listen("tauri-frame://snap/mousedown", () => {
-          if (!cancelled) setIsMaxOver(true)
+        await listen('tauri-frame://snap/mousedown', () => {
+          if (!cancelled)
+            setIsMaxOver(true);
         }),
-      )
-    }
+      );
+    };
 
-    wire()
+    wire();
 
     return () => {
-      cancelled = true
-      unlisteners.forEach((unlisten) => unlisten())
-    }
-  }, [onMaximizeToggle])
+      cancelled = true;
+      unlisteners.forEach(unlisten => unlisten());
+    };
+  }, [onMaximizeToggle]);
 
   function handleMinimize() {
-    getCurrentWindow().minimize()
+    getCurrentWindow().minimize();
   }
 
   function handleToggleMaximize() {
-    getCurrentWindow().toggleMaximize()
-    onMaximizeToggle?.()
+    getCurrentWindow().toggleMaximize();
+    onMaximizeToggle?.();
   }
 
   function handleClose() {
     if (onClose) {
-      onClose()
-    } else {
-      getCurrentWindow().close()
+      onClose();
+    }
+    else {
+      getCurrentWindow().close();
     }
   }
 
   return (
     <div
       className="titlebar-caption-bar"
-      data-focused={isFocused ? "true" : "false"}
+      data-focused={isFocused ? 'true' : 'false'}
     >
       {/* Minimize */}
       <button
@@ -126,22 +134,25 @@ export function WindowControls({ isMaximized, onMaximizeToggle, onClose }: Windo
 
       {/* Maximize / Restore */}
       <button
-        className={`titlebar-caption-btn${isMaxOver ? " titlebar-caption-over" : ""}`}
-        aria-label={isMaximized ? "Restore" : "Maximize"}
-        title={isMaximized ? "Restore" : "Maximize"}
+        className={`titlebar-caption-btn
+          ${isMaxOver ? 'titlebar-caption-over' : ''}`}
+        aria-label={isMaximized ? 'Restore' : 'Maximize'}
+        title={isMaximized ? 'Restore' : 'Maximize'}
         onClick={handleToggleMaximize}
       >
-        {isMaximized ? (
-          /* Restore: two overlapping rectangles */
-          <svg width="10" height="10" viewBox="0 0 10 10" fill="none" aria-hidden="true">
-            <path d="M3.5 0.5h6v6M0.5 3.5h6v6h-6z" stroke="currentColor" strokeWidth="1" />
-          </svg>
-        ) : (
-          /* Maximize: single rectangle */
-          <svg width="10" height="10" viewBox="0 0 10 10" fill="none" aria-hidden="true">
-            <rect x="0.5" y="0.5" width="9" height="9" stroke="currentColor" strokeWidth="1" />
-          </svg>
-        )}
+        {isMaximized
+          ? (
+            /* Restore: two overlapping rectangles */
+              <svg width="10" height="10" viewBox="0 0 10 10" fill="none" aria-hidden="true">
+                <path d="M3.5 0.5h6v6M0.5 3.5h6v6h-6z" stroke="currentColor" strokeWidth="1" />
+              </svg>
+            )
+          : (
+            /* Maximize: single rectangle */
+              <svg width="10" height="10" viewBox="0 0 10 10" fill="none" aria-hidden="true">
+                <rect x="0.5" y="0.5" width="9" height="9" stroke="currentColor" strokeWidth="1" />
+              </svg>
+            )}
       </button>
 
       {/* Close */}
@@ -156,7 +167,7 @@ export function WindowControls({ isMaximized, onMaximizeToggle, onClose }: Windo
         </svg>
       </button>
     </div>
-  )
+  );
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -169,17 +180,17 @@ export interface TitleBarProps {
    * On macOS, WindowControls is hidden (native traffic lights handle it)
    * and a left-padding is added to avoid overlapping the traffic light area.
    */
-  isMac: boolean
+  isMac: boolean;
   /**
    * Custom content to render inside the titlebar (e.g. app title, toolbar items).
    * Receives the full available width between the drag region and window controls.
    */
-  children?: ReactNode
+  children?: ReactNode;
   /**
    * Called when close button is clicked (Windows/Linux).
    * If not provided, closes the window directly.
    */
-  onClose?: () => void
+  onClose?: () => void;
 }
 
 /**
@@ -199,50 +210,53 @@ export interface TitleBarProps {
  * ```
  */
 export function TitleBar({ isMac, children, onClose }: TitleBarProps) {
-  const [isMaximized, setIsMaximized] = useState(false)
-  const unlistenResizeRef = useRef<(() => void) | null>(null)
+  const [isMaximized, setIsMaximized] = useState(false);
+  const unlistenResizeRef = useRef<(() => void) | null>(null);
 
   // Track maximize state for the WindowControls icon toggle.
   // macOS: skipped — native traffic lights handle maximize; calling isMaximized()
   // inside onResized triggers an infinite loop on macOS (tauri-apps/tauri#5812).
   useEffect(() => {
-    if (isMac) return
+    if (isMac)
+      return;
 
-    const appWindow = getCurrentWindow()
-    let cancelled = false
+    const appWindow = getCurrentWindow();
+    let cancelled = false;
 
     // Read initial state
     appWindow.isMaximized().then((v) => {
-      if (!cancelled) setIsMaximized(v)
-    })
+      if (!cancelled)
+        setIsMaximized(v);
+    });
 
     // Subscribe to resize events to update maximize state
     appWindow.onResized(async () => {
       if (!cancelled) {
-        const maximized = await appWindow.isMaximized()
-        setIsMaximized(maximized)
+        const maximized = await appWindow.isMaximized();
+        setIsMaximized(maximized);
       }
     }).then((unlisten) => {
       if (cancelled) {
-        unlisten()
-      } else {
-        unlistenResizeRef.current = unlisten
+        unlisten();
       }
-    })
+      else {
+        unlistenResizeRef.current = unlisten;
+      }
+    });
 
     return () => {
-      cancelled = true
-      unlistenResizeRef.current?.()
-      unlistenResizeRef.current = null
-    }
-  }, [isMac])
+      cancelled = true;
+      unlistenResizeRef.current?.();
+      unlistenResizeRef.current = null;
+    };
+  }, [isMac]);
 
   function handleMaximizeToggle() {
     // Query state after a short delay to let the native animation settle
     setTimeout(async () => {
-      const appWindow = getCurrentWindow()
-      setIsMaximized(await appWindow.isMaximized())
-    }, 300)
+      const appWindow = getCurrentWindow();
+      setIsMaximized(await appWindow.isMaximized());
+    }, 300);
   }
 
   return (
@@ -269,5 +283,5 @@ export function TitleBar({ isMac, children, onClose }: TitleBarProps) {
         />
       )}
     </header>
-  )
+  );
 }

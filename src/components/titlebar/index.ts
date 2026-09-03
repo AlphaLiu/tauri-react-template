@@ -1,2 +1,2 @@
-export { TitleBar, WindowControls } from "./TitleBar"
-export type { TitleBarProps, WindowControlsProps } from "./TitleBar"
+export { TitleBar, WindowControls } from './TitleBar';
+export type { TitleBarProps, WindowControlsProps } from './TitleBar';

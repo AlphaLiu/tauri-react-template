@@ -1,15 +1,15 @@
-import { Info } from "@phosphor-icons/react"
-import { useEffect, useState } from "react"
+import { Info } from '@phosphor-icons/react';
+import { getVersion } from '@tauri-apps/api/app';
 
-import { getVersion } from "@tauri-apps/api/app"
-import appIcon from "@/assets/icon.png"
+import { useEffect, useState } from 'react';
+import appIcon from '@/assets/icon.png';
 
 function formatBuildDate() {
   return new Date(__BUILD_DATE__).toLocaleDateString(undefined, {
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-  })
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  });
 }
 
 function InfoRow({ label, value }: { label: string; value: string }) {
@@ -21,17 +21,17 @@ function InfoRow({ label, value }: { label: string; value: string }) {
       </span>
       <span className="font-mono text-xs text-muted-foreground/80">{value}</span>
     </div>
-  )
+  );
 }
 
 export function AboutTab() {
-  const [version, setVersion] = useState("—")
+  const [version, setVersion] = useState('—');
 
   useEffect(() => {
     getVersion()
       .then(setVersion)
-      .catch(() => {})
-  }, [])
+      .catch(() => {});
+  }, []);
 
   return (
     <div className="flex h-full flex-col">
@@ -66,5 +66,5 @@ export function AboutTab() {
         </div>
       </div>
     </div>
-  )
+  );
 }

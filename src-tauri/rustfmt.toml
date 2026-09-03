@@ -1,0 +1,8 @@
+# rustfmt.toml
+max_width = 80
+hard_tabs = false
+tab_spaces = 2
+newline_style = "Unix"
+use_small_heuristics = "max"
+reorder_imports = true
+edition = "2021"
