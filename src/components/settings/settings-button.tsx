@@ -3,20 +3,17 @@ import { useState } from 'react';
 import { SettingsDialog } from '@/components/settings/settings-dialog';
 import { Button } from '@/components/ui/button';
 
-interface SettingsButtonProps {
-  onClick?: () => void;
-}
-
-export function SettingsButton({ onClick }: SettingsButtonProps) {
+export function SettingsButton() {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
     <>
       <Button
         onClick={() => {
-          onClick?.();
           setIsOpen(true);
         }}
+        title="Settings"
+        aria-label="Settings"
         className="
           max-h-8 w-11.5 cursor-default rounded-none bg-transparent text-black/90
           hover:bg-black/5
