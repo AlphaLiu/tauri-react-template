@@ -41,7 +41,7 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
     <Dialog
       isOpen={open}
       onOpenChange={onOpenChange}
-      className="h-[70vh] w-200 overflow-hidden rounded-xl p-0 sm:max-w-200"
+      className="h-[70vh] w-200 overflow-hidden rounded-xl p-0 sm:max-w-[min(50rem,calc(100%-2rem))]"
     >
       <DialogTitle className="sr-only">Settings</DialogTitle>
       <DialogDescription className="sr-only">
