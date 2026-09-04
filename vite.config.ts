@@ -28,6 +28,25 @@ export default defineConfig({
     },
   },
 
+  build: {
+    chunkSizeWarningLimit: 2500,
+    rolldownOptions: {
+      output: {
+        codeSplitting: {
+          groups: [
+            {
+              name: 'vendor',
+              test: /node_modules/,
+              minSize: 100000,
+              maxSize: 250000,
+              priority: 10,
+            },
+          ],
+        },
+      },
+    },
+  },
+
   // Vite options tailored for Tauri development and only applied in `tauri dev` or `tauri build`
   //
   // 1. prevent vite from obscuring rust errors
