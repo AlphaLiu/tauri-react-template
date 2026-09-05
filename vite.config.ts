@@ -7,6 +7,13 @@ import babel from '@rolldown/plugin-babel';
 
 const host = process.env.TAURI_DEV_HOST
 
+// Extract the npm package name (scoped packages included) from a module id
+// e.g. ".../node_modules/@scope/pkg/dist/index.js" -> "@scope/pkg"
+function getPackageName(id: string) {
+  const match = /node_modules[\\/](@[^\\/]+[\\/][^\\/]+|[^\\/]+)/.exec(id)
+  return match ? match[1].replace(/[\\/]/g, "-").replace(/^@/, "") : null
+}
+
 function getGitRev() {
   try {
     return execSync("git rev-parse --short HEAD").toString().trim()
@@ -18,6 +25,7 @@ function getGitRev() {
 // https://vite.dev/config/
 export default defineConfig({
   define: {
+    __APP_VERSION__: JSON.stringify(process.env.npm_package_version ?? '0.0.1'),
     __BUILD_DATE__: JSON.stringify(new Date().toISOString()),
     __GIT_REV__: JSON.stringify(getGitRev()),
   },
@@ -35,10 +43,10 @@ export default defineConfig({
         codeSplitting: {
           groups: [
             {
-              name: 'vendor',
+              // one chunk per npm package
+              name: id => getPackageName(id),
               test: /node_modules/,
               minSize: 100000,
-              maxSize: 250000,
               priority: 10,
             },
           ],
