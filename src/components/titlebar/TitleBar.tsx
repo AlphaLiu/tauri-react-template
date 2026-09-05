@@ -29,12 +29,20 @@ export interface WindowControlsProps {
   onClose?: () => void;
 }
 
+/** True inside a Tauri webview; plain-browser dev/preview has no runtime. */
+function isTauriRuntime(): boolean {
+  return typeof window !== 'undefined' && '__TAURI_INTERNALS__' in window;
+}
+
 export function WindowControls({ isMaximized, onMaximizeToggle, onClose }: WindowControlsProps) {
   const [isFocused, setIsFocused] = useState(true);
   const [isMaxOver, setIsMaxOver] = useState(false);
   const unlistenRef = useRef<(() => void) | null>(null);
 
   useEffect(() => {
+    if (!isTauriRuntime())
+      return;
+
     const appWindow = getCurrentWindow();
     let cancelled = false;
 
@@ -63,6 +71,9 @@ export function WindowControls({ isMaximized, onMaximizeToggle, onClose }: Windo
   // on Windows; on other platforms the button's plain onClick below keeps
   // working.
   useEffect(() => {
+    if (!isTauriRuntime())
+      return;
+
     let cancelled = false;
     const unlisteners: UnlistenFn[] = [];
 
@@ -217,7 +228,7 @@ export function TitleBar({ isMac, children, onClose }: TitleBarProps) {
   // macOS: skipped — native traffic lights handle maximize; calling isMaximized()
   // inside onResized triggers an infinite loop on macOS (tauri-apps/tauri#5812).
   useEffect(() => {
-    if (isMac)
+    if (isMac || !isTauriRuntime())
       return;
 
     const appWindow = getCurrentWindow();
