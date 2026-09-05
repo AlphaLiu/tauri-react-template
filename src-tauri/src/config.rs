@@ -6,7 +6,8 @@ use std::{
 
 use serde::{Deserialize, Serialize};
 use specta::Type;
-use tauri::{AppHandle, Manager};
+#[cfg(target_os = "macos")]
+use tauri::Manager;
 
 // ─── Data model ─────────────────────────────────────────────────────────────
 

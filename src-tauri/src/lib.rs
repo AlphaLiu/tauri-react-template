@@ -1,6 +1,7 @@
 mod config;
 mod window_state;
 
+#[cfg(debug_assertions)]
 use specta_typescript::Typescript;
 
 use tauri::ipc::Channel;

@@ -1,7 +1,5 @@
 import { Info } from '@phosphor-icons/react';
-import { getVersion } from '@tauri-apps/api/app';
 
-import { useEffect, useState } from 'react';
 import appIcon from '@/assets/icon.png';
 
 function formatBuildDate() {
@@ -25,14 +23,6 @@ function InfoRow({ label, value }: { label: string; value: string }) {
 }
 
 export function AboutTab() {
-  const [version, setVersion] = useState('—');
-
-  useEffect(() => {
-    getVersion()
-      .then(setVersion)
-      .catch(() => {});
-  }, []);
-
   return (
     <div className="flex h-full flex-col">
       <h2 className="shrink-0 px-5 pt-5 pb-3 text-lg font-semibold text-foreground">
@@ -59,7 +49,7 @@ export function AboutTab() {
           </div>
 
           <div className="space-y-2 rounded-md bg-muted p-3">
-            <InfoRow label="Version" value={`v${version}`} />
+            <InfoRow label="Version" value={`v${__APP_VERSION__}`} />
             <InfoRow label="Build Date" value={formatBuildDate()} />
             <InfoRow label="Git Revision" value={__GIT_REV__} />
           </div>
